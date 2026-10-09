@@ -1,0 +1,13 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useStore } from "@/components/StoreProvider";
+
+export default function LoginPage() {
+  const router = useRouter(); const { signIn } = useStore();
+  const [form, setForm] = useState({ email: "", password: "" }); const [error, setError] = useState(""); const [busy, setBusy] = useState(false);
+  async function submit(event) { event.preventDefault(); setBusy(true); setError(""); try { await signIn(form); router.push(new URLSearchParams(window.location.search).get("next") || "/profile"); } catch (err) { setError(err.message); } finally { setBusy(false); } }
+  return <main className="grid min-h-[75vh] place-items-center bg-white px-5 py-12 dark:bg-[#000000]"><section className="w-full max-w-md rounded-2xl border border-black/10 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#000000]"><p className="text-xs font-bold uppercase tracking-widest text-violet-700 dark:text-violet-300">Welcome back</p><h1 className="mt-2 text-3xl font-bold">Sign in</h1><form onSubmit={submit} className="mt-7 space-y-4"><label className="block text-sm font-medium">Email<input type="email" required autoComplete="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="mt-1 w-full rounded-lg border border-black/10 px-3 py-2.5 outline-none focus:border-violet-500 dark:border-white/15 dark:bg-[#000000] dark:text-white dark:placeholder:text-black/55" /></label><label className="block text-sm font-medium">Password<input type="password" required autoComplete="current-password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="mt-1 w-full rounded-lg border border-black/10 px-3 py-2.5 outline-none focus:border-violet-500 dark:border-white/15 dark:bg-[#000000] dark:text-white dark:placeholder:text-black/55" /></label>{error && <p role="alert" className="rounded-lg bg-violet-50 p-3 text-sm text-violet-700 dark:bg-violet-950 dark:text-violet-200">{error}</p>}<button disabled={busy} className="w-full rounded-full bg-violet-700 py-3 font-bold text-white transition hover:bg-violet-700 dark:bg-violet-300 dark:text-[#000000] dark:hover:bg-violet-300 disabled:opacity-60">{busy ? "Signing in…" : "Sign in"}</button></form><p className="mt-4 text-sm text-black/75 dark:text-white/75"><Link className="text-violet-700 hover:underline dark:text-violet-300" href="/forgot-password">Forgot password?</Link></p><p className="mt-5 border-t pt-5 text-sm text-black/75 dark:text-white/75">New to ASIAN STORE? <Link className="font-semibold text-violet-700 hover:underline dark:text-violet-300" href="/signup">Create an account</Link></p></section></main>;
+}

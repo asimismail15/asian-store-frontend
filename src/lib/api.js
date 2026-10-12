@@ -17,14 +17,16 @@ function demoCatalog(params = {}) {
 }
 
 function resolveApiBase(value) {
+  const configuredValue = value?.trim();
+  if (!configuredValue) return isDevelopment ? DEFAULT_API_URL : "";
   try {
-    const parsed = new URL(value || DEFAULT_API_URL);
+    const parsed = new URL(configuredValue);
     const path = parsed.pathname.replace(/\/+$/, "");
-    if (!/^https?:$/.test(parsed.protocol) || !path.toLowerCase().endsWith("/api") || parsed.search || parsed.hash) return DEFAULT_API_URL;
+    if (!/^https?:$/.test(parsed.protocol) || !path.toLowerCase().endsWith("/api") || parsed.search || parsed.hash) return isDevelopment ? DEFAULT_API_URL : "";
     const normalizedPath = path.replace(/(?:\/api)+$/i, "/api");
     return `${parsed.origin}${normalizedPath}`;
   } catch {
-    return DEFAULT_API_URL;
+    return isDevelopment ? DEFAULT_API_URL : "";
   }
 }
 
@@ -40,6 +42,9 @@ export class ApiError extends Error {
 }
 
 export async function api(path, options = {}) {
+  if (!API_URL) {
+    throw new ApiError("NEXT_PUBLIC_API_URL is missing or invalid. Set it to your deployed API URL ending in /api, then rebuild and redeploy the frontend.", 0);
+  }
   // API_URL is normalized to the `/api` root once; helpers pass endpoint paths only.
   const pathValue = String(path);
   if (/^[a-z][a-z\d+.-]*:\/\//i.test(pathValue)) throw new ApiError("Pass an API endpoint path, not a full URL.", 0);
@@ -56,7 +61,7 @@ export async function api(path, options = {}) {
     response = await fetch(endpoint, { ...options, headers, signal: options.signal || controller.signal, cache: "no-store" });
   } catch (error) {
     if (error?.name === "AbortError") throw new ApiError(`The ASIAN STORE API did not respond within ${REQUEST_TIMEOUT_MS / 1000} seconds. Confirm the backend is listening at ${API_URL}.`, 0);
-    throw new ApiError(`Can't connect to ${API_URL}. Start the Express API on port 5000, or set NEXT_PUBLIC_API_URL to its reachable address.`, 0);
+    throw new ApiError(`Can't connect to ${API_URL}. Confirm the API is running and reachable from the browser.`, 0);
   } finally {
     clearTimeout(timeout);
   }

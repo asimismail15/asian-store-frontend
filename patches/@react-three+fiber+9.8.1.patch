@@ -1,0 +1,204 @@
+diff --git a/node_modules/@react-three/fiber/dist/events-21d8cd92.cjs.dev.js b/node_modules/@react-three/fiber/dist/events-21d8cd92.cjs.dev.js
+index 9b43bdf..3d68ef9 100644
+--- a/node_modules/@react-three/fiber/dist/events-21d8cd92.cjs.dev.js
++++ b/node_modules/@react-three/fiber/dist/events-21d8cd92.cjs.dev.js
+@@ -32,6 +32,44 @@ var React__namespace = /*#__PURE__*/_interopNamespace(React);
+ var THREE__namespace = /*#__PURE__*/_interopNamespace(THREE);
+ var w1__default = /*#__PURE__*/_interopDefault(w1);
+ 
++// Adapt Three.js Timer to Fiber's existing clock-shaped root state API.
++class FiberTimer extends THREE__namespace.Timer {
++  constructor() {
++    super();
++    this._fiberElapsedTime = 0;
++    this._fiberOldTime = 0;
++    this._fiberRunning = true;
++  }
++  get elapsedTime() { return this._fiberElapsedTime; }
++  set elapsedTime(value) {
++    this._fiberElapsedTime = value;
++    this._fiberOldTime = value;
++    this._elapsed = value * 1000;
++    this._delta = 0;
++    this.reset();
++  }
++  get oldTime() { return this._fiberOldTime; }
++  set oldTime(value) { this._fiberOldTime = value; }
++  start() {
++    this._fiberRunning = true;
++    this._delta = 0;
++    this.reset();
++    return this;
++  }
++  stop() {
++    this._fiberRunning = false;
++    this._delta = 0;
++    return this;
++  }
++  update(timestamp) {
++    if (!this._fiberRunning) return this;
++    this._fiberOldTime = this._fiberElapsedTime;
++    super.update(timestamp);
++    this._fiberElapsedTime = super.getElapsed();
++    return this;
++  }
++}
++
+ var threeTypes = /*#__PURE__*/Object.freeze({
+   __proto__: null
+ });
+@@ -1076,7 +1114,7 @@ const createStore = (invalidate, advance) => {
+       linear: false,
+       flat: false,
+       controls: null,
+-      clock: new THREE__namespace.Clock(),
++      clock: new FiberTimer(),
+       pointer,
+       mouse: pointer,
+       frameloop: 'always',
+@@ -17424,6 +17462,7 @@ let subscribers;
+ let subscription;
+ function update(timestamp, state, frame) {
+   // Run local effects
++  state.clock.update(timestamp);
+   let delta = state.clock.getDelta();
+ 
+   // In frameloop='never' mode, clock times are updated using the provided timestamp
+diff --git a/node_modules/@react-three/fiber/dist/events-9ce18a08.esm.js b/node_modules/@react-three/fiber/dist/events-9ce18a08.esm.js
+index ea6b4c9..df81f80 100644
+--- a/node_modules/@react-three/fiber/dist/events-9ce18a08.esm.js
++++ b/node_modules/@react-three/fiber/dist/events-9ce18a08.esm.js
+@@ -7,6 +7,50 @@ import { suspend, preload, clear } from 'suspend-react';
+ import w1, { unstable_getCurrentPriorityLevel, unstable_IdlePriority, unstable_LowPriority, unstable_NormalPriority, unstable_UserBlockingPriority, unstable_ImmediatePriority, unstable_scheduleCallback } from 'scheduler';
+ import { useFiber, useContextBridge, traverseFiber, useActivityBridge as useActivityBridge$1 } from 'its-fine';
+ 
++// Adapt Three.js Timer to Fiber's existing clock-shaped root state API.
++class FiberTimer extends THREE.Timer {
++  constructor() {
++    super();
++    this._fiberElapsedTime = 0;
++    this._fiberOldTime = 0;
++    this._fiberRunning = true;
++  }
++  get elapsedTime() {
++    return this._fiberElapsedTime;
++  }
++  set elapsedTime(value) {
++    this._fiberElapsedTime = value;
++    this._fiberOldTime = value;
++    this._elapsed = value * 1000;
++    this._delta = 0;
++    this.reset();
++  }
++  get oldTime() {
++    return this._fiberOldTime;
++  }
++  set oldTime(value) {
++    this._fiberOldTime = value;
++  }
++  start() {
++    this._fiberRunning = true;
++    this._delta = 0;
++    this.reset();
++    return this;
++  }
++  stop() {
++    this._fiberRunning = false;
++    this._delta = 0;
++    return this;
++  }
++  update(timestamp) {
++    if (!this._fiberRunning) return this;
++    this._fiberOldTime = this._fiberElapsedTime;
++    super.update(timestamp);
++    this._fiberElapsedTime = super.getElapsed();
++    return this;
++  }
++}
++
+ var threeTypes = /*#__PURE__*/Object.freeze({
+   __proto__: null
+ });
+@@ -1051,7 +1095,7 @@ const createStore = (invalidate, advance) => {
+       linear: false,
+       flat: false,
+       controls: null,
+-      clock: new THREE.Clock(),
++      clock: new FiberTimer(),
+       pointer,
+       mouse: pointer,
+       frameloop: 'always',
+@@ -17399,6 +17443,7 @@ let subscribers;
+ let subscription;
+ function update(timestamp, state, frame) {
+   // Run local effects
++  state.clock.update(timestamp);
+   let delta = state.clock.getDelta();
+ 
+   // In frameloop='never' mode, clock times are updated using the provided timestamp
+diff --git a/node_modules/@react-three/fiber/dist/events-a816cbab.cjs.prod.js b/node_modules/@react-three/fiber/dist/events-a816cbab.cjs.prod.js
+index c26a227..4396d6c 100644
+--- a/node_modules/@react-three/fiber/dist/events-a816cbab.cjs.prod.js
++++ b/node_modules/@react-three/fiber/dist/events-a816cbab.cjs.prod.js
+@@ -32,6 +32,44 @@ var React__namespace = /*#__PURE__*/_interopNamespace(React);
+ var THREE__namespace = /*#__PURE__*/_interopNamespace(THREE);
+ var w1__default = /*#__PURE__*/_interopDefault(w1);
+ 
++// Adapt Three.js Timer to Fiber's existing clock-shaped root state API.
++class FiberTimer extends THREE__namespace.Timer {
++  constructor() {
++    super();
++    this._fiberElapsedTime = 0;
++    this._fiberOldTime = 0;
++    this._fiberRunning = true;
++  }
++  get elapsedTime() { return this._fiberElapsedTime; }
++  set elapsedTime(value) {
++    this._fiberElapsedTime = value;
++    this._fiberOldTime = value;
++    this._elapsed = value * 1000;
++    this._delta = 0;
++    this.reset();
++  }
++  get oldTime() { return this._fiberOldTime; }
++  set oldTime(value) { this._fiberOldTime = value; }
++  start() {
++    this._fiberRunning = true;
++    this._delta = 0;
++    this.reset();
++    return this;
++  }
++  stop() {
++    this._fiberRunning = false;
++    this._delta = 0;
++    return this;
++  }
++  update(timestamp) {
++    if (!this._fiberRunning) return this;
++    this._fiberOldTime = this._fiberElapsedTime;
++    super.update(timestamp);
++    this._fiberElapsedTime = super.getElapsed();
++    return this;
++  }
++}
++
+ var threeTypes = /*#__PURE__*/Object.freeze({
+   __proto__: null
+ });
+@@ -1076,7 +1114,7 @@ const createStore = (invalidate, advance) => {
+       linear: false,
+       flat: false,
+       controls: null,
+-      clock: new THREE__namespace.Clock(),
++      clock: new FiberTimer(),
+       pointer,
+       mouse: pointer,
+       frameloop: 'always',
+@@ -8645,6 +8683,7 @@ let subscribers;
+ let subscription;
+ function update(timestamp, state, frame) {
+   // Run local effects
++  state.clock.update(timestamp);
+   let delta = state.clock.getDelta();
+ 
+   // In frameloop='never' mode, clock times are updated using the provided timestamp

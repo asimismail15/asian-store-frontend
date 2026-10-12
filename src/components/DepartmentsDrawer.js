@@ -32,7 +32,7 @@ export default function DepartmentsDrawer({ open, onClose, categories = [], unre
   return (
     <div className="fixed inset-0 z-[90]">
       <button type="button" aria-label="Close departments menu" onClick={onClose} className="departments-backdrop absolute inset-0 bg-black/55 backdrop-blur-[2px] dark:bg-black/75" />
-      <aside id="departments-drawer-title" role="dialog" aria-modal="true" aria-label={t("browse")} className="departments-drawer absolute inset-y-0 left-0 flex w-[min(23rem,88vw)] flex-col border-r border-violet-200 bg-white text-black shadow-2xl dark:border-violet-900 dark:bg-[#09090b] dark:text-white">
+      <aside id="departments-drawer-title" role="dialog" aria-modal="true" aria-label={t("browse")} className="lux-modal departments-drawer absolute inset-y-0 left-0 flex w-[min(23rem,88vw)] flex-col border-r border-violet-200 bg-white text-black shadow-2xl dark:border-violet-900 dark:bg-[#09090b] dark:text-white">
         <header className="flex items-center justify-between border-b border-violet-100 bg-black px-5 py-5 text-white dark:border-violet-900 dark:bg-[#111111]">
           <div><p className="text-[9px] font-bold uppercase tracking-[.2em] text-violet-300">ASIAN STORE</p><h2 className="mt-1 text-lg font-semibold">{t("browse")}</h2></div>
           <button type="button" onClick={onClose} aria-label="Close departments menu" className="grid size-10 place-items-center rounded-full border border-white/20 text-white transition hover:border-violet-300 hover:bg-violet-700"><X size={19}/></button>

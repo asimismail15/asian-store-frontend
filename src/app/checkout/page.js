@@ -80,7 +80,6 @@ export default function CheckoutPage() {
         const orderId = `DEMO-${crypto.randomUUID()}`;
         const demoOrders = JSON.parse(localStorage.getItem("asian-store-demo-orders") || "[]");
         localStorage.setItem("asian-store-demo-orders", JSON.stringify([{ id: orderId, total: subtotal, status: "Pending", paymentMethod, paymentAccount: paymentMethod === "easypaisa" || paymentMethod === "jazzcash" ? `••••••${paymentDetails.senderPhone.slice(-4)}` : undefined, createdAt: new Date().toISOString(), shipping: shippingDetails, giftOptions }, ...demoOrders].slice(0, 20)));
-        console.info("[mock-email]", { to: shippingDetails.email, subject: `ASIAN STORE order ${orderId} confirmed`, message: "Your demo order has been received.", simulated: true });
         await clearCart({ remote: true });
         router.push(`/checkout/success?order=${encodeURIComponent(orderId)}&simulated=1`);
         return;
@@ -111,9 +110,9 @@ export default function CheckoutPage() {
   const inputClass = "mt-1 w-full rounded-lg border border-black/10 bg-white px-3 py-2.5 outline-none focus:border-violet-700 dark:border-white/15 dark:bg-black dark:focus:border-violet-300";
 
   return <main className="lux-fade-in mx-auto max-w-5xl px-4 py-10 text-black dark:text-white sm:px-5 sm:py-12">
-    <h1 className="text-3xl font-bold">Checkout</h1>
+    <h1 className="scroll-section text-3xl font-bold">Checkout</h1>
     <div className="mt-7 grid items-start gap-6 md:grid-cols-2">
-      <form onSubmit={prepare} className="space-y-4 rounded-2xl border border-black/10 bg-white p-6 dark:border-white/15 dark:bg-black">
+      <form onSubmit={prepare} className="scroll-section space-y-4 rounded-2xl border border-black/10 bg-white p-6 dark:border-white/15 dark:bg-black">
         <h2 className="text-lg font-bold">Shipping details</h2>
         {fields.slice(0, 3).map(([key, label]) => <label key={key} className="block text-sm font-medium">{label}<input required value={shipping[key]} onChange={(event) => setShipping({ ...shipping, [key]: event.target.value })} className={inputClass} /></label>)}
         <label className="block text-sm font-medium">Country<select required value={shippingDetails.country} onChange={(event) => { setShipping({ ...shipping, country: event.target.value }); setShippingCountry(event.target.value); }} className="mt-1 w-full rounded-lg border border-black/10 bg-white px-3 py-2.5 text-black dark:border-white/15 dark:bg-black dark:text-white">{shippingCountries.map((country) => <option key={country}>{country}</option>)}</select></label>
@@ -147,7 +146,7 @@ export default function CheckoutPage() {
         <p className="flex justify-between border-t border-black/10 pt-4 dark:border-white/15"><span>Order total</span><strong>{formatPrice(subtotal)}</strong></p>
         <button disabled={loading} className="min-h-12 w-full rounded-full bg-violet-700 py-3 font-semibold text-white disabled:opacity-50 dark:bg-violet-300 dark:text-black">{loading ? "Preparing checkout..." : paymentMethod === "card" && !simulationMode ? clientSecret ? "Refresh payment details" : "Continue to secure card payment" : `Place ${paymentMethod === "cod" ? "COD" : paymentMethod === "easypaisa" ? "EasyPaisa" : paymentMethod === "jazzcash" ? "JazzCash" : "demo card"} order`}</button>
       </form>
-      {clientSecret && stripePromise && orderId ? <Elements stripe={stripePromise} options={{ clientSecret }}><PaymentForm clientSecret={clientSecret} orderId={orderId} shipping={shippingDetails} cardholder={paymentDetails.cardholder} amount={amount} onError={setError} refreshCart={refreshCart} /></Elements> : <div className="rounded-2xl border border-black/10 bg-white p-6 text-sm text-black/70 dark:border-white/15 dark:bg-black dark:text-white/70">{simulationMode ? "Demo checkout is active. Demo orders are saved locally; no payment is processed." : "Select a payment method and complete shipping details to continue."}</div>}
+      {clientSecret && stripePromise && orderId ? <Elements stripe={stripePromise} options={{ clientSecret }}><div className="scroll-section"><PaymentForm clientSecret={clientSecret} orderId={orderId} shipping={shippingDetails} cardholder={paymentDetails.cardholder} amount={amount} onError={setError} refreshCart={refreshCart} /></div></Elements> : <div className="scroll-section rounded-2xl border border-black/10 bg-white p-6 text-sm text-black/70 dark:border-white/15 dark:bg-black dark:text-white/70">{simulationMode ? "Demo checkout is active. Demo orders are saved locally; no payment is processed." : "Select a payment method and complete shipping details to continue."}</div>}
     </div>
     {error && <p role="alert" className="mt-5 rounded-lg bg-violet-50 p-3 text-sm text-violet-800 dark:bg-violet-950/40 dark:text-violet-200">{error}</p>}
   </main>;

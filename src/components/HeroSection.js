@@ -1,53 +1,87 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowDown, ArrowRight } from "lucide-react";
+import dynamic from "next/dynamic";
+import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/components/StoreProvider";
 
+const HeroScene = dynamic(() => import("@/components/HeroScene"), {
+  ssr: false,
+  loading: () => <div aria-hidden="true" className="hero-scene-placeholder" />,
+});
+
+const rise = {
+  hidden: { opacity: 0, y: 26 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.72, ease: [0.22, 1, 0.36, 1] } },
+};
+
 export default function HeroSection() {
+  const sceneSlot = useRef(null);
+  const [sceneReady, setSceneReady] = useState(false);
+  const [sceneInView, setSceneInView] = useState(false);
+  const reduceMotion = useReducedMotion();
   const { theme } = useStore();
-  const image = theme === "dark"
-    ? "/asian-store-hero-dark-neutral.png"
-    : "/asian-store-hero-light-neutral.png";
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    if (!sceneSlot.current || !("IntersectionObserver" in window)) {
+      const frame = window.requestAnimationFrame(() => {
+        setSceneReady(true);
+        setSceneInView(true);
+      });
+      return () => window.cancelAnimationFrame(frame);
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) setSceneReady(true);
+      setSceneInView(entry.isIntersecting);
+    }, { rootMargin: "100px" });
+    observer.observe(sceneSlot.current);
+    return () => observer.disconnect();
+  }, [reduceMotion]);
 
   return (
-    <section className="mx-auto max-w-[1500px] px-4 pt-3 sm:px-8 sm:pt-6">
-      <div className="lux-hero relative grid min-h-[510px] overflow-hidden bg-white dark:bg-[#111111] md:min-h-[590px] md:grid-cols-[.85fr_1.15fr]">
-        <div className="relative z-10 flex flex-col items-start justify-center px-7 py-12 sm:px-14 md:px-16">
-          <p className="text-[9px] font-bold tracking-[.24em] text-violet-700 dark:text-violet-300">ASIAN STORE &middot; COLLECTION 01</p>
-          <h1 className="mt-6 max-w-lg text-5xl font-black leading-[.98] tracking-[-.075em] sm:text-6xl lg:text-[76px]">
-            The art of<br />
-            <span className="bg-gradient-to-r from-violet-700 via-violet-600 to-violet-500 bg-clip-text font-serif italic text-transparent">everyday.</span>
-          </h1>
-          <p className="mt-6 max-w-sm text-sm leading-6 text-black/65 dark:text-white/70">
-            A thoughtful edit of pieces made for your life. Discover good design, considered details, and enduring essentials.
-          </p>
-          <Link href="/shop" className="lux-cta mt-8 inline-flex items-center gap-3 rounded-full bg-violet-700 px-8 py-4 text-[11px] font-bold tracking-[.12em] text-white shadow-lg shadow-violet-700/20 transition ">
-            DISCOVER THE COLLECTION <ArrowRight size={14} />
-          </Link>
-          <Link href="#catalog" className="absolute bottom-7 left-7 hidden items-center gap-2 text-[9px] tracking-[.15em] text-violet-700 sm:flex md:left-14">
+    <section className="hero-showcase-wrap mx-auto max-w-[1600px] px-3 pt-3 sm:px-6 sm:pt-5 lg:px-8">
+      <div className="lux-hero hero-showcase relative isolate grid min-h-[min(780px,calc(100svh-7rem))] overflow-hidden rounded-[2rem] border border-violet-200/60 bg-[#faf9ff] dark:border-white/10 dark:bg-[#09080d] lg:grid-cols-[.88fr_1.12fr]">
+        <div className="hero-showcase-copy relative z-10 flex flex-col items-start justify-center px-7 py-14 sm:px-12 lg:px-16 xl:px-20">
+          <motion.div
+            initial={reduceMotion ? false : "hidden"}
+            animate="visible"
+            transition={{ staggerChildren: 0.12, delayChildren: 0.08 }}
+            className="max-w-xl"
+          >
+            <motion.h1 variants={rise} className="text-5xl font-black leading-[.94] tracking-[-.075em] sm:text-6xl lg:text-[clamp(4.5rem,7vw,7.4rem)]">
+              The art of<br />
+              <span className="bg-gradient-to-r from-violet-700 via-violet-500 to-fuchsia-400 bg-clip-text font-serif italic font-medium text-transparent">everyday.</span>
+            </motion.h1>
+            <motion.p variants={rise} className="mt-7 max-w-sm text-sm leading-6 text-black/65 dark:text-white/65 sm:text-base sm:leading-7">
+              Objects with a point of view. Meet the considered pieces that make the everyday feel extraordinary.
+            </motion.p>
+            <motion.div variants={rise}>
+              <Link href="/shop" className="lux-cta mt-9 inline-flex items-center gap-3 rounded-full bg-violet-700 px-8 py-4 text-[10px] font-bold tracking-[.14em] text-white transition hover:bg-violet-800 dark:bg-violet-300 dark:text-black dark:hover:bg-violet-200">
+                DISCOVER THE COLLECTION <ArrowRight size={14} />
+              </Link>
+            </motion.div>
+          </motion.div>
+          <Link href="#catalog" className="absolute bottom-7 left-7 hidden items-center gap-2 text-[9px] font-semibold tracking-[.15em] text-violet-700 dark:text-violet-300 sm:flex lg:left-12 xl:left-20">
             <ArrowDown size={14} /> SCROLL TO EXPLORE
           </Link>
         </div>
 
-        <div className="lux-hero-image relative min-h-[300px] overflow-hidden bg-white dark:bg-[#111111] md:min-h-full">
-          <Image
-            src={image}
-            alt="A shopper presenting the ASIAN STORE logo on her phone"
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, 60vw"
-            className="lux-hero-photo"
-          />
-          <div aria-hidden="true" className={`absolute inset-0 ${theme === "dark" ? "bg-gradient-to-tr from-[#09090b]/45 via-[#111111]/15 to-black/20 mix-blend-multiply" : "bg-gradient-to-tr from-white/25 via-transparent to-white/10 mix-blend-screen"}`} />
-          <div className="absolute bottom-5 right-5 rounded-xl bg-white/90 px-4 py-3 shadow-xl backdrop-blur dark:bg-black/80">
-            <p className="text-[8px] font-bold tracking-[.18em] text-violet-700">THE EDIT</p>
-            <p className="mt-1 text-xs font-semibold">Everything you love, in one place</p>
-          </div>
-        </div>
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, scale: 0.78, x: 36, rotate: -5 }}
+          animate={{ opacity: 1, scale: 1, x: 0, rotate: 0 }}
+          transition={{ duration: reduceMotion ? 0 : 1.1, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+          ref={sceneSlot}
+          className="hero-showcase-stage relative min-h-[380px] overflow-hidden sm:min-h-[480px] lg:min-h-full"
+          aria-label="Interactive three-dimensional ASIAN STORE product showcase"
+        >
+          <div className="hero-scene-glow" aria-hidden="true" />
+          {sceneReady || reduceMotion ? <HeroScene theme={theme} reducedMotion={Boolean(reduceMotion)} frameloop={reduceMotion || !sceneInView ? "demand" : "always"} /> : <div aria-hidden="true" className="hero-scene-placeholder" />}
+          <div className="hero-scene-index absolute right-6 top-6 z-10 font-mono text-[9px] tracking-[.18em] text-violet-800/60 dark:text-violet-200/55">01 <span className="mx-1 opacity-40">/</span> 08</div>
+        </motion.div>
       </div>
     </section>
   );
 }
-

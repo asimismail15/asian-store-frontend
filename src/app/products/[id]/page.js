@@ -8,6 +8,7 @@ import { BadgeCheck, Heart, Star } from "lucide-react";
 import { productApi } from "@/lib/api";
 import { useStore } from "@/components/StoreProvider";
 import RecommendationSection from "@/components/RecommendationSection";
+import ProductInspectViewer from "@/components/ProductInspectViewer";
 import { rememberViewedProduct } from "@/lib/recommendations";
 
 function RatingStars({ value, size = 16 }) {
@@ -68,11 +69,11 @@ export default function ProductPage() {
   if (!product) return <main className="mx-auto max-w-5xl p-10 text-black/55">Loading product…</main>;
 
   return <main className="mx-auto max-w-6xl px-5 py-10 sm:py-12">
-    <div className="grid gap-8 md:grid-cols-2 md:gap-10">
+    <div className="scroll-section grid gap-8 md:grid-cols-2 md:gap-10">
       <div className="relative">
         <div className="lux-pdp-gallery relative grid min-h-80 place-items-center overflow-hidden rounded-3xl bg-white p-6 dark:bg-black sm:min-h-96 sm:p-8">
-          {gallery[selectedImage] ? <Image key={gallery[selectedImage]} src={gallery[selectedImage]} alt={product.title} width={900} height={840} priority unoptimized className="lux-pdp-image max-h-[28rem] object-contain" /> : <div className="text-8xl">Product</div>}
-          <button onClick={() => toggleFavorite(product)} aria-label={isFavorite(product._id) ? "Remove from wishlist" : "Add to wishlist"} className="absolute right-5 top-5 grid size-11 place-items-center rounded-full bg-white text-black/75 hover:text-violet-600 dark:bg-black dark:text-white/70"><Heart className={isFavorite(product._id) ? "fill-violet-500 text-violet-500" : ""} /></button>
+          <ProductInspectViewer key={gallery[selectedImage] || "empty"} image={gallery[selectedImage]} alt={product.title} />
+          <button onClick={() => toggleFavorite(product)} aria-label={isFavorite(product._id) ? "Remove from wishlist" : "Add to wishlist"} className="action-particle-trigger absolute right-5 top-5 grid size-11 place-items-center rounded-full bg-white text-black/75 hover:text-violet-600 dark:bg-black dark:text-white/70"><Heart className={isFavorite(product._id) ? "fill-violet-500 text-violet-500" : ""} /></button>
         </div>
         {gallery.length > 1 && <div className="mt-3 flex gap-3 overflow-x-auto pb-2">{gallery.map((image, index) => <button key={`${image}-${index}`} type="button" onClick={() => setSelectedImage(index)} aria-label={`Show product image ${index + 1}`} aria-pressed={selectedImage === index} className={`grid size-20 shrink-0 place-items-center overflow-hidden rounded-xl border-2 bg-white p-2 transition dark:bg-black ${selectedImage === index ? "border-violet-600 shadow-lg shadow-violet-700/15" : "border-black/10 dark:border-white/15"}`}><Image src={image} alt="" width={80} height={80} unoptimized className="size-full object-contain"/></button>)}</div>}
       </div>
@@ -88,7 +89,7 @@ export default function ProductPage() {
           {sizes.length > 0 && <label className="text-xs font-semibold">Size<select value={selectedSize} onChange={(event) => setSelectedSize(event.target.value)} className="mt-2 block w-full rounded-xl border border-black/15 bg-white px-3 py-3 text-sm dark:border-white/20 dark:bg-black"><option value="">Choose a size</option>{sizes.map((size) => <option key={size} value={size}>{size}</option>)}</select></label>}
           {colors.length > 0 && <label className="text-xs font-semibold">Color<select value={selectedColor} onChange={(event) => setSelectedColor(event.target.value)} className="mt-2 block w-full rounded-xl border border-black/15 bg-white px-3 py-3 text-sm dark:border-white/20 dark:bg-black"><option value="">Choose a color</option>{colors.map((color) => <option key={color} value={color}>{color}</option>)}</select></label>}
         </div>}
-        <button disabled={!product.stock || busy || (sizes.length > 0 && !selectedSize) || (colors.length > 0 && !selectedColor)} onClick={add} className="lux-pdp-add mt-7 rounded-full bg-violet-700 px-8 py-3 font-bold text-white disabled:opacity-40">{busy ? "Adding..." : "Add to cart"}</button>
+        <button disabled={!product.stock || busy || (sizes.length > 0 && !selectedSize) || (colors.length > 0 && !selectedColor)} onClick={add} className="action-particle-trigger lux-pdp-add mt-7 rounded-full bg-violet-700 px-8 py-3 font-bold text-white disabled:opacity-40">{busy ? "Adding..." : "Add to cart"}</button>
       </section>
     </div>
 

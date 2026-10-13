@@ -41,6 +41,8 @@ export default function ProductCard({ product, onQuickView, index = 0 }) {
     const rect = event.currentTarget.getBoundingClientRect();
     const x = (event.clientX - rect.left) / rect.width - 0.5;
     const y = (event.clientY - rect.top) / rect.height - 0.5;
+    visualRef.current.style.setProperty("--spot-x", `${(x + 0.5) * 100}%`);
+    visualRef.current.style.setProperty("--spot-y", `${(y + 0.5) * 100}%`);
     visualRef.current.style.transform = `perspective(1000px) rotateX(${y * -8}deg) rotateY(${x * 9}deg) translateZ(8px)`;
   }
 
@@ -68,10 +70,10 @@ export default function ProductCard({ product, onQuickView, index = 0 }) {
 
   return (
     <motion.article
-      initial={reduceMotion ? false : { opacity: 0, y: 22, scale: 0.985 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, amount: 0.16 }}
-      transition={{ duration: 0.48, delay: (index % 4) * 0.065, ease: [0.22, 1, 0.36, 1] }}
+      initial={reduceMotion ? false : { opacity: 0, y: 28, rotateX: 5, scale: 0.985 }}
+      whileInView={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.12 }}
+      transition={{ duration: 0.68, delay: (index % 4) * 0.055, ease: [0.22, 1, 0.36, 1] }}
       whileHover={reduceMotion ? undefined : { y: -5, scale: 1.012 }}
       className="lux-product group"
     >
@@ -79,7 +81,7 @@ export default function ProductCard({ product, onQuickView, index = 0 }) {
         <button type="button" onClick={() => onQuickView ? onQuickView(product) : setInspecting(true)} aria-label={`Inspect ${product.title} in 3D`} className="block w-full cursor-zoom-in text-left">
           <div className="relative aspect-[.78] w-full">
             {image ? (
-              <Image src={image} alt={product.title} fill unoptimized sizes="(max-width: 640px) 50vw, (max-width: 1200px) 33vw, 25vw" className="lux-product-image object-contain p-5 sm:p-8" />
+            <Image src={image} alt={product.title} fill unoptimized sizes="(max-width: 640px) 50vw, (max-width: 1200px) 33vw, 25vw" className="lux-product-image object-contain p-2.5 sm:p-8" />
             ) : (
               <div className="grid h-full place-items-center font-serif text-7xl text-black/40">A.</div>
             )}
@@ -107,11 +109,11 @@ export default function ProductCard({ product, onQuickView, index = 0 }) {
       </div>
       {inspecting && <QuickViewModal product={product} onClose={() => setInspecting(false)} />}
 
-      <div className="pt-4">
+        <div className="pt-3 sm:pt-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[8px] font-semibold tracking-[.18em] text-violet-600 dark:text-violet-300">{product.category?.toUpperCase()}</p>
-            <Link href={`/products/${id}`}><h2 className="mt-1.5 line-clamp-2 text-xs font-medium leading-5 tracking-[.01em] hover:underline">{product.title}</h2></Link>
+            <p className="text-[8px] font-semibold tracking-[.1em] text-violet-600 dark:text-violet-300 sm:tracking-[.18em]">{product.category?.toUpperCase()}</p>
+            <Link href={`/products/${id}`}><h2 className="mt-1 line-clamp-2 break-words text-[11px] font-medium leading-4 tracking-[.01em] hover:underline sm:mt-1.5 sm:text-xs sm:leading-5">{product.title}</h2></Link>
           </div>
           <motion.button
             type="button"
@@ -141,7 +143,7 @@ export default function ProductCard({ product, onQuickView, index = 0 }) {
           disabled={busy || product.stock <= 0}
           onClick={add}
           whileTap={reduceMotion || busy || product.stock <= 0 ? undefined : { scale: 0.975 }}
-          className="action-feedback-host relative lux-glass mt-3 w-full rounded-full border border-violet-200/70 py-2.5 text-[9px] font-semibold tracking-[.14em] text-violet-800 hover:border-violet-700 hover:bg-violet-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-40 dark:border-violet-900 dark:text-violet-200 dark:hover:bg-violet-600"
+          className="action-feedback-host relative lux-glass mt-2.5 min-h-11 w-full rounded-full border border-violet-200/70 px-1 py-2 text-[8px] font-semibold tracking-[.1em] text-violet-800 hover:border-violet-700 hover:bg-violet-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-40 sm:mt-3 sm:px-3 sm:text-[9px] sm:tracking-[.14em] dark:border-violet-900 dark:text-violet-200 dark:hover:bg-violet-600"
         >
           {product._isDemo ? "DEMO ITEM" : busy ? "ADDING..." : "ADD TO BAG"}
           {feedback.target === "cart" && <ActionBurst kind="cart" pulse={feedback.pulse} />}

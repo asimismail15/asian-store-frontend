@@ -124,7 +124,9 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px
 .lux-modal { border: 1px solid var(--asim-border); background: color-mix(in srgb, var(--asim-surface) 94%, transparent); color: var(--asim-text); box-shadow: 0 28px 90px rgb(0 0 0 / 28%), inset 0 1px 0 rgb(255 255 255 / 12%); -webkit-backdrop-filter: blur(22px) saturate(1.18); backdrop-filter: blur(22px) saturate(1.18); transition: color .3s ease, background-color .3s ease, border-color .3s ease, box-shadow .3s ease; }
 @media (max-width: 767px) { .hero-showcase { border-radius: 1.5rem; } .hero-scene-index { top: 1.25rem; right: 1.25rem; } }
 .lux-product, .lux-product-visual { transition: border-color .24s cubic-bezier(.22,1,.36,1), background-color .24s cubic-bezier(.22,1,.36,1), box-shadow .24s cubic-bezier(.22,1,.36,1), transform .24s cubic-bezier(.22,1,.36,1); }
+.lux-product { perspective: 1400px; transform-style: preserve-3d; }
 .lux-product-visual { transform-style: preserve-3d; }
+.lux-product-visual::after { background: radial-gradient(circle at var(--spot-x, 50%) var(--spot-y, 35%), rgb(255 255 255 / 48%), transparent 35%), linear-gradient(125deg, transparent 28%, rgb(255 255 255 / 24%) 48%, transparent 63%); }
 .lux-product-image { transition: transform .7s cubic-bezier(.22,1,.36,1); }
 .lux-product:hover .lux-product-image { transform: scale(1.055); }
 .lux-product:hover { box-shadow: 0 20px 50px color-mix(in srgb, var(--asim-purple) 20%, transparent); }
@@ -185,6 +187,14 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px
 .dark textarea::placeholder { color: rgb(255 255 255 / 58%); }
 .dark select option { background-color: #000000; color: #ffffff; }
 .asim-toast { border: 1px solid var(--asim-border); }
+.mobile-search-screen { padding-bottom: env(safe-area-inset-bottom); animation: mobile-search-enter .34s cubic-bezier(.22,1,.36,1) both; }
+.mobile-search-screen > header { padding-top: max(1rem, env(safe-area-inset-top)); }
+@keyframes mobile-search-enter { from { opacity: 0; transform: translateY(12px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+@media (hover: hover) and (pointer: fine) {
+  .lux-product-visual:hover::after { opacity: 1; }
+  .lux-product-visual:hover { box-shadow: inset 0 1px 0 #fff, 0 28px 60px rgb(57 31 95 / 28%), 0 0 34px rgb(139 92 246 / 26%); }
+}
 
 @keyframes lux-shimmer { to { background-position-x: -200%; } }
 @keyframes lux-slide-in { from { opacity: .65; transform: translateX(1rem); } to { opacity: 1; transform: translateX(0); } }
@@ -203,5 +213,6 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px
 }
 @media (max-width: 640px) { .ambient-scene { opacity: .36; } .dark .ambient-scene { opacity: .3; } }
 @media (prefers-reduced-motion: reduce) { .ambient-scene { display: none; } }
+@media (prefers-reduced-motion: reduce) { .mobile-search-screen { animation: none; } }
 
 

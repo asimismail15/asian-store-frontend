@@ -18,11 +18,11 @@ export default function ScrollEffects() {
         context = gsap.context(() => {
           gsap.utils.toArray("main section:not(.hero-showcase-wrap), main .scroll-section, main .category-swatch, main > header, main > aside, footer").forEach((section) => {
             gsap.fromTo(section,
-              { autoAlpha: 0, y: 34 },
+              { autoAlpha: 0, y: 26, rotateX: 1.2, transformPerspective: 1400 },
               {
                 autoAlpha: 1,
                 y: 0,
-                duration: 0.82,
+                duration: 0.72,
                 ease: "power3.out",
                 clearProps: "transform",
                 scrollTrigger: { trigger: section, start: "top 90%", once: true },

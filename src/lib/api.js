@@ -1,4 +1,3 @@
-const DEFAULT_API_URL = "http://localhost:5000/api";
 const isDevelopment = process.env.NODE_ENV === "development";
 
 function demoCatalog(params = {}) {
@@ -16,21 +15,7 @@ function demoCatalog(params = {}) {
   });
 }
 
-function resolveApiBase(value) {
-  const configuredValue = value?.trim();
-  if (!configuredValue) return isDevelopment ? DEFAULT_API_URL : "";
-  try {
-    const parsed = new URL(configuredValue);
-    const path = parsed.pathname.replace(/\/+$/, "");
-    if (!/^https?:$/.test(parsed.protocol) || !path.toLowerCase().endsWith("/api") || parsed.search || parsed.hash) return isDevelopment ? DEFAULT_API_URL : "";
-    const normalizedPath = path.replace(/(?:\/api)+$/i, "/api");
-    return `${parsed.origin}${normalizedPath}`;
-  } catch {
-    return isDevelopment ? DEFAULT_API_URL : "";
-  }
-}
-
-export const API_URL = resolveApiBase(process.env.NEXT_PUBLIC_API_URL);
+export const API_URL = "/api";
 const REQUEST_TIMEOUT_MS = 20000;
 
 export class ApiError extends Error {
@@ -42,10 +27,7 @@ export class ApiError extends Error {
 }
 
 export async function api(path, options = {}) {
-  if (!API_URL) {
-    throw new ApiError("NEXT_PUBLIC_API_URL is missing or invalid. Set it to your deployed API URL ending in /api, then rebuild and redeploy the frontend.", 0);
-  }
-  // API_URL is normalized to the `/api` root once; helpers pass endpoint paths only.
+  // API and storefront share one Vercel origin.
   const pathValue = String(path);
   if (/^[a-z][a-z\d+.-]*:\/\//i.test(pathValue)) throw new ApiError("Pass an API endpoint path, not a full URL.", 0);
   const endpoint = `${API_URL}/${pathValue.replace(/^\/+/, "").replace(/^(?:api\/)+/i, "")}`;
@@ -60,8 +42,8 @@ export async function api(path, options = {}) {
   try {
     response = await fetch(endpoint, { ...options, headers, signal: options.signal || controller.signal, cache: "no-store" });
   } catch (error) {
-    if (error?.name === "AbortError") throw new ApiError(`The ASIAN STORE API did not respond within ${REQUEST_TIMEOUT_MS / 1000} seconds. Confirm the backend is listening at ${API_URL}.`, 0);
-    throw new ApiError(`Can't connect to ${API_URL}. Confirm the API is running and reachable from the browser.`, 0);
+    if (error?.name === "AbortError") throw new ApiError(`The ASIAN STORE API did not respond within ${REQUEST_TIMEOUT_MS / 1000} seconds. Please try again.`, 0);
+    throw new ApiError("Can't connect to the ASIAN STORE API. Check your connection and try again.", 0);
   } finally {
     clearTimeout(timeout);
   }
